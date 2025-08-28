@@ -220,12 +220,11 @@ def release_lock(lockfile: Path):
 
 
 def update_readme(summary_path: Path, readme_path: Path = Path("README.md")):
-    """Update README.md with last update time, proxy stats, and download links."""
     DOWNLOAD_LINKS = {
-        "http": "https://raw.githubusercontent.com/mohhammedcha/ProxRipper/main/full_proxies/http.txt",
-        "https": "https://raw.githubusercontent.com/mohhammedcha/ProxRipper/main/full_proxies/https.txt",
-        "socks4": "https://raw.githubusercontent.com/mohhammedcha/ProxRipper/main/full_proxies/socks4.txt",
-        "socks5": "https://raw.githubusercontent.com/mohhammedcha/ProxRipper/main/full_proxies/socks5.txt",
+        "http": "https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/http.txt",
+        "https": "https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/https.txt",
+        "socks4": "https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks4.txt",
+        "socks5": "https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks5.txt",
     }
 
     if not summary_path.exists():
