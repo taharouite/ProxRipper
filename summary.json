@@ -952,7 +952,6 @@
         ]
       }
     },
-<<<<<<< HEAD
     "duration_seconds": 15.28
   },
   {
@@ -1396,8 +1395,5 @@
       }
     },
     "duration_seconds": 15.86
-=======
-    "duration_seconds": 15.95
->>>>>>> cc1e0ad (Update proxy scraper: human-readable GMT+1 timestamps, README update fix, all changes)
   }
 ]
