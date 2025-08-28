@@ -41,7 +41,7 @@ jobs:
       - name: Push changes
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.email "40530012+Mohammedcha@users.noreply.github.com"
           git add full_proxies/*.txt summary.json README.md
           # Force a commit even if files look unchanged
           TZ="Europe/Paris" git commit --allow-empty -m "Auto update proxies [$(date '+%d %b %Y %H:%M:%S GMT+1')]"
