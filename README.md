@@ -52,7 +52,7 @@ Access a **trusted free proxy list** without registration or payment, ideal for 
 Get the latest **free proxies** directly from GitHub:
 
 - **HTTP Proxies:** [http.txt](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/http.txt)  
-- **HTTPS Proxies:** [https.txt](https://raw.githubusercontent.com/mohhammedcha/ProxRipper/main/full_proxies/https.txt)  
+- **HTTPS Proxies:** [https.txt](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/https.txt)  
 - **SOCKS4 Proxies:** [socks4.txt](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks4.txt)  
 - **SOCKS5 Proxies:** [socks5.txt](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks5.txt)  
 
