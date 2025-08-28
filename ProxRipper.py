@@ -10,11 +10,12 @@ import sys
 import time
 from aiohttp import ClientTimeout, TCPConnector
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from random import uniform
 from typing import List, Dict, Set, Tuple
 
+# ---------------- CONFIG ----------------
 PROXY_SOURCES: Dict[str, List[str]] = {
     "http": [
         "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/refs/heads/master/http.txt",
@@ -86,6 +87,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger("proxy-scraper")
 
+GMT1 = timezone(timedelta(hours=1))
+
+# ---------------- HELPER FUNCTIONS ----------------
 
 def _is_valid_proxy_line(line: str) -> bool:
     if not line or line.startswith("#"):
@@ -100,14 +104,12 @@ def _is_valid_proxy_line(line: str) -> bool:
     except Exception:
         return False
 
-
 def _is_public_ip(host: str) -> bool:
     try:
         ip = ipaddress.ip_address(host)
         return not (ip.is_private or ip.is_loopback or ip.is_reserved or ip.is_multicast)
     except Exception:
         return False
-
 
 async def fetch_url(session: aiohttp.ClientSession, url: str) -> str:
     for attempt in range(1, MAX_SOURCE_RETRIES + 1):
@@ -123,7 +125,6 @@ async def fetch_url(session: aiohttp.ClientSession, url: str) -> str:
             await asyncio.sleep(uniform(1, 3))
     return ""
 
-
 def parse_proxies(text: str) -> List[str]:
     proxies = []
     for line in text.splitlines():
@@ -133,7 +134,6 @@ def parse_proxies(text: str) -> List[str]:
             if _is_public_ip(host):
                 proxies.append(line)
     return proxies
-
 
 async def gather_all_proxies() -> Dict[str, Set[str]]:
     results = defaultdict(set)
@@ -157,14 +157,12 @@ async def gather_all_proxies() -> Dict[str, Set[str]]:
 
     return results
 
-
 def atomic_write(path: Path, lines: List[str]):
     tmp = path.with_suffix(".tmp")
     with tmp.open("w", encoding="utf-8") as f:
         for line in lines:
             f.write(line + "\n")
     tmp.replace(path)
-
 
 def load_previous_set(path: Path) -> Set[str]:
     if path.exists():
@@ -174,26 +172,20 @@ def load_previous_set(path: Path) -> Set[str]:
             return set()
     return set()
 
-
 def summarize_changes(prev: Set[str], current: Set[str]) -> Tuple[Set[str], Set[str]]:
     return current - prev, prev - current
-
 
 def write_summary_file(path: Path, summary: Dict, keep_last: int = 120):
     try:
         existing = []
         if path.exists():
             existing = json.loads(path.read_text(encoding="utf-8"))
-
         existing.append(summary)
-
         if len(existing) > keep_last:
             existing = existing[-keep_last:]
-
         path.write_text(json.dumps(existing, indent=2), encoding="utf-8")
     except Exception as e:
         logger.error("error writing summary: %s", e)
-
 
 def acquire_lock(lockfile: Path):
     if lockfile.exists():
@@ -210,7 +202,6 @@ def acquire_lock(lockfile: Path):
                 raise
     lockfile.write_text(str(os.getpid()))
 
-
 def release_lock(lockfile: Path):
     try:
         if lockfile.exists():
@@ -218,6 +209,8 @@ def release_lock(lockfile: Path):
     except Exception:
         pass
 
+def get_human_readable_time() -> str:
+    return datetime.now(tz=GMT1).strftime("%d %b %Y %H:%M:%S GMT+1")
 
 def update_readme(summary_path: Path, readme_path: Path = Path("README.md")):
     DOWNLOAD_LINKS = {
@@ -240,6 +233,7 @@ def update_readme(summary_path: Path, readme_path: Path = Path("README.md")):
         timestamp = latest.get("timestamp", "Unknown")
         results = latest.get("results", {})
 
+        # Build table first
         table_lines = [
             "| Proxy Type | Total | Added | Removed | Download |",
             "|------------|-------|-------|---------|----------|"
@@ -249,13 +243,11 @@ def update_readme(summary_path: Path, readme_path: Path = Path("README.md")):
             link = DOWNLOAD_LINKS.get(proto, "#")
             table_lines.append(f"| {proto.upper()} | {r['total']} | {r['added']} | {r['removed']} | [Download]({link}) |")
 
-        readme_text = readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
-
         section_start = "<!-- PROXY_STATS_START -->"
         section_end = "<!-- PROXY_STATS_END -->"
-        new_section = "\n".join([section_start, f"**Last Update:** {timestamp} UTC", "", *table_lines, section_end])
+        new_section = "\n".join([section_start, f"**Last Update:** {timestamp}", "", *table_lines, section_end])
 
-        import re
+        readme_text = readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
         if section_start in readme_text:
             readme_text = re.sub(f"{section_start}.*?{section_end}", new_section, readme_text, flags=re.DOTALL)
         else:
@@ -267,14 +259,14 @@ def update_readme(summary_path: Path, readme_path: Path = Path("README.md")):
     except Exception as e:
         logger.error("Failed to update README: %s", e)
 
-
+# ---------------- MAIN ----------------
 async def main():
     acquire_lock(LOCKFILE)
     start = time.time()
     try:
         proxies = await gather_all_proxies()
         summary = {
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": get_human_readable_time(),
             "results": {},
             "duration_seconds": None,
         }
@@ -283,10 +275,9 @@ async def main():
             out_path = OUTPUT_DIR / f"{proto}.txt"
             prev_set = load_previous_set(out_path)
             added, removed = summarize_changes(prev_set, new_set)
-
             if new_set:
                 atomic_write(out_path, sorted(new_set))
-                
+
             summary["results"][proto] = {
                 "total": len(new_set),
                 "added": len(added),
@@ -297,14 +288,14 @@ async def main():
 
         summary["duration_seconds"] = round(time.time() - start, 2)
         write_summary_file(SUMMARY_FILE, summary)
-        logger.info("run complete in %.2fs", summary["duration_seconds"])
+        logger.info("Run complete in %.2fs", summary["duration_seconds"])
 
         update_readme(SUMMARY_FILE)
 
     finally:
         release_lock(LOCKFILE)
 
-
+# ---------------- ENTRY ----------------
 if __name__ == "__main__":
     try:
         asyncio.run(main())

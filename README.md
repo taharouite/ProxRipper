@@ -11,6 +11,7 @@ Access a **trusted free proxy list** without registration or payment, ideal for 
 ## ⚡ Free Proxy Stats
 
 <!-- PROXY_STATS_START -->
+<<<<<<< HEAD
 **Last Update:** 2025-08-28T08:17:09.780259Z UTC
 
 | Proxy Type | Total | Added | Removed | Download |
@@ -19,6 +20,16 @@ Access a **trusted free proxy list** without registration or payment, ideal for 
 | HTTPS | 52660 | 1263 | 2096 | [Download](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/https.txt) |
 | SOCKS4 | 104266 | 232 | 281 | [Download](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks4.txt) |
 | SOCKS5 | 126291 | 64 | 73 | [Download](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks5.txt) |
+=======
+**Last Update:** 28 Aug 2025 09:33:15 GMT+1
+
+| Proxy Type | Total | Added | Removed | Download |
+|------------|-------|-------|---------|----------|
+| HTTP | 134223 | 108 | 76 | [Download](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/http.txt) |
+| HTTPS | 52588 | 16 | 1 | [Download](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/https.txt) |
+| SOCKS4 | 104251 | 59 | 64 | [Download](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks4.txt) |
+| SOCKS5 | 126286 | 14 | 4 | [Download](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks5.txt) |
+>>>>>>> cc1e0ad (Update proxy scraper: human-readable GMT+1 timestamps, README update fix, all changes)
 <!-- PROXY_STATS_END -->
 
 > Updated automatically every 15 minutes to ensure **fresh and working proxies**.
