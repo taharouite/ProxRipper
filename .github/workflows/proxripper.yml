@@ -2,7 +2,7 @@ name: ProxRipper Auto Scraper
 
 on:
   schedule:
-    - cron: "*/15 * * * *"  
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -29,12 +29,20 @@ jobs:
         run: pip install aiohttp
 
       - name: Run ProxRipper
-        run: python ProxRipper.py
+        run: |
+          python ProxRipper.py
+          # Log total proxies for each type
+          echo "=== Proxy Stats ==="
+          for proto in http https socks4 socks5; do
+            count=$(wc -l < full_proxies/$proto.txt || echo 0)
+            echo "$proto: $count proxies"
+          done
 
       - name: Push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add full_proxies/*.txt summary.json README.md
-          git commit -m "Auto update proxies [$(date)]" || echo "No changes to commit"
+          # Force a commit even if files look unchanged
+          git commit --allow-empty -m "Auto update proxies [$(date -u)]"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Mohammedcha/ProxRipper.git HEAD:main
