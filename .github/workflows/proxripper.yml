@@ -1,0 +1,38 @@
+name: ProxRipper Auto Scraper
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"  
+  workflow_dispatch:   
+
+concurrency:
+  group: proxripper
+  cancel-in-progress: true  
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install aiohttp
+
+      - name: Run ProxRipper
+        run: python ProxRipper.py
+
+      - name: Commit & Push results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add full_proxies/*.txt summary.json
+          git commit -m "Auto update proxies [$(date)]" || echo "No changes to commit"
+          git push
