@@ -59,10 +59,18 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           TIMESTAMP=$(date '+%d %b %Y %H:%M:%S GMT+1')
-          MESSAGE="🌐 *ProxRipper Proxy Update*\n🕒 Updated: $TIMESTAMP\n\n📥 Download proxies directly:\n- HTTP: [http.txt](https://mohammedcha.github.io/ProxRipper/full_proxies/http.txt)\n- HTTPS: [https.txt](https://mohammedcha.github.io/ProxRipper/full_proxies/https.txt)\n- SOCKS4: [socks4.txt](https://mohammedcha.github.io/ProxRipper/full_proxies/socks4.txt)\n- SOCKS5: [socks5.txt](https://mohammedcha.github.io/ProxRipper/full_proxies/socks5.txt)\n\n🌍 Visit our [website](https://mohammedcha.github.io/ProxRipper/) to filter proxies by country!"
-          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
-            -F chat_id="$TELEGRAM_CHAT_ID" \
-            -F text="$MESSAGE" \
-            -F parse_mode="Markdown" \
-            -F disable_web_page_preview=true
-            
+
+          for proto in http https socks4 socks5; do
+            FILE_URL="https://mohammedcha.github.io/ProxRipper/full_proxies/$proto.txt"
+            COUNT=$(wc -l < full_proxies/$proto.txt || echo 0)
+
+            # Compose message safely
+            MESSAGE="🌐 *$proto Proxy Update*\n📄 Total: $COUNT\n🕒 Updated: $TIMESTAMP\n📥 Download: [$proto.txt]($FILE_URL)\n🌍 Visit website: [ProxRipper](https://mohammedcha.github.io/ProxRipper/)"
+
+            # Send message
+            curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+              -F chat_id="$TELEGRAM_CHAT_ID" \
+              -F text="$MESSAGE" \
+              -F parse_mode="Markdown" \
+              -F disable_web_page_preview=true
+          done
