@@ -306,19 +306,21 @@ if ('serviceWorker' in navigator) {
 }
 
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const btn = document.createElement('button');
-  btn.textContent = 'Install ProxRipper';
-  btn.className = 'fixed bottom-6 right-6 bg-primary-500 text-white p-3 rounded-full';
-  document.body.appendChild(btn);
 
-  btn.addEventListener('click', async () => {
-    btn.remove();
+const installBtn = document.getElementById('install-btn');
+const topBar = document.getElementById('top-bar');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    topBar.classList.remove('hidden');
+});
+
+installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     console.log(`User response: ${outcome}`);
     deferredPrompt = null;
-  });
+    topBar.classList.add('hidden'); 
 });
