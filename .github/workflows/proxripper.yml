@@ -39,6 +39,7 @@ jobs:
       - name: Run ProxRipper
         run: |
           python ProxRipper.py
+          # Log total proxies for each type
           echo "=== Proxy Stats ==="
           for proto in http https socks4 socks5; do
             count=$(wc -l < full_proxies/$proto.txt || echo 0)
@@ -50,26 +51,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "40530012+Mohammedcha@users.noreply.github.com"
           git add full_proxies/*.txt summary.json README.md
-          git diff-index --quiet HEAD || TZ="Europe/Paris" git commit -m "Auto update proxies [$(date '+%d %b %Y %H:%M:%S GMT+1')]"
+          # Force a commit even if files look unchanged
+          TZ="Europe/Paris" git commit --allow-empty -m "Auto update proxies [$(date '+%d %b %Y %H:%M:%S GMT+1')]"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Mohammedcha/ProxRipper.git HEAD:main
 
-      - name: Send proxies to Telegram
+      - name: Send update to Telegram
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          for proto in http https socks4 socks5; do
-            FILE_URL="https://mohammedcha.github.io/ProxRipper/full_proxies/$proto.txt"
-            COUNT=$(wc -l < full_proxies/$proto.txt || echo 0)
-
-            # Plain text message without Markdown or links
-            MESSAGE="ProxRipper $proto Proxy Update
-            Total proxies: $COUNT
-            Download: $FILE_URL
-            Website: https://mohammedcha.github.io/ProxRipper/"
-
-            curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
-              -F chat_id="$TELEGRAM_CHAT_ID" \
-              -F text="$MESSAGE" \
-              -F disable_web_page_preview=true
-          done
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+            -F chat_id="$TELEGRAM_CHAT_ID" \
+            -F text="UPDATED" \
+            -F disable_web_page_preview=true
