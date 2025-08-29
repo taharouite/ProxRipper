@@ -60,14 +60,14 @@ jobs:
           TIMESTAMP=$(date '+%d %b %Y %H:%M:%S GMT+1')
           MESSAGE=$(cat <<-EOF
           🌐 *ProxRipper Proxy Update*
-
           🕒 *Updated*: ${TIMESTAMP//./\\.}
 
           📥 *Download proxies directly*:
-          \- [HTTP](https://mohammedcha.github.io/ProxRipper/full_proxies/http\.txt)
-          \- [HTTPS](https://mohammedcha.github.io/ProxRipper/full_proxies/https\.txt)
-          \- [SOCKS4](https://mohammedcha.github.io/ProxRipper/full_proxies/socks4\.txt)
-          \- [SOCKS5](https://mohammedcha.github.io/ProxRipper/full_proxies/socks5\.txt)
+
+          \- HTTP Proxies : [DOWNLOAD](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/http.txt)
+          \- HTTPS Proxies : [DOWNLOAD](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/https.txt)
+          \- SOCKS4 Proxies : [DOWNLOAD](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks4.txt)
+          \- SOCKS5 Proxies : [DOWNLOAD](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks5.txt)
 
           🌍 *Visit our* [website](https://mohammedcha.github.io/ProxRipper/) *to filter proxies by country*\!
           EOF
