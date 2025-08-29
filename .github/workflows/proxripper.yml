@@ -68,7 +68,7 @@ jobs:
             MESSAGE="🌐 *$proto Proxy Update*\n📄 Total: $COUNT\n🕒 Updated: $TIMESTAMP\n📥 Download: [$proto.txt]($FILE_URL)\n🌍 Visit website: [ProxRipper](https://mohammedcha.github.io/ProxRipper/)"
 
             # Send message
-            curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+            curl -v -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
               -F chat_id="$TELEGRAM_CHAT_ID" \
               -F text="$MESSAGE" \
               -F parse_mode="Markdown" \
