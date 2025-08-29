@@ -54,3 +54,9 @@ jobs:
           # Force a commit even if files look unchanged
           TZ="Europe/Paris" git commit --allow-empty -m "Auto update proxies [$(date '+%d %b %Y %H:%M:%S GMT+1')]"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Mohammedcha/ProxRipper.git HEAD:main
+
+      - name: Send Telegram Notification
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="UPDATED"
