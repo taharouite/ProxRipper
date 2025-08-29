@@ -60,21 +60,19 @@ jobs:
         run: |
           TIMESTAMP=$(date '+%d %b %Y %H:%M:%S GMT+1')
 
-          # Function to escape special characters for MarkdownV2
-          escape_markdown() {
-            echo "$1" | sed -E 's/([\_\*\[\]\(\)\~\`\>\#\+\-\=\|\{\}\.\!])/\\\1/g'
-          }
-
           for proto in http https socks4 socks5; do
             FILE_URL="https://mohammedcha.github.io/ProxRipper/full_proxies/$proto.txt"
             COUNT=$(wc -l < full_proxies/$proto.txt || echo 0)
 
-            MESSAGE="🌐 *$proto Proxy Update*\n📄 Total: $COUNT\n🕒 Updated: $TIMESTAMP\n📥 Download: [$proto.txt]($FILE_URL)\n🌍 Visit website: [ProxRipper](https://mohammedcha.github.io/ProxRipper/)"
-            SAFE_MESSAGE=$(escape_markdown "$MESSAGE")
+            # Plain text message without Markdown or links
+            MESSAGE="ProxRipper $proto Proxy Update
+            Total proxies: $COUNT
+            Updated: $TIMESTAMP
+            Download: $FILE_URL
+            Website: https://mohammedcha.github.io/ProxRipper/"
 
             curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
               -F chat_id="$TELEGRAM_CHAT_ID" \
-              -F text="$SAFE_MESSAGE" \
-              -F parse_mode="MarkdownV2" \
+              -F text="$MESSAGE" \
               -F disable_web_page_preview=true
           done
