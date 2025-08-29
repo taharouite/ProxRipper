@@ -25128,5 +25128,39 @@
       }
     },
     "duration_seconds": 14.96
+  },
+  {
+    "timestamp": "29 Aug 2025 08:12:50 GMT+1",
+    "results": {
+      "http": {
+        "total": 135489,
+        "added": 0,
+        "removed": 0,
+        "added_list": [],
+        "removed_list": []
+      },
+      "socks4": {
+        "total": 106384,
+        "added": 0,
+        "removed": 0,
+        "added_list": [],
+        "removed_list": []
+      },
+      "https": {
+        "total": 53068,
+        "added": 0,
+        "removed": 0,
+        "added_list": [],
+        "removed_list": []
+      },
+      "socks5": {
+        "total": 127553,
+        "added": 0,
+        "removed": 0,
+        "added_list": [],
+        "removed_list": []
+      }
+    },
+    "duration_seconds": 15.01
   }
 ]
