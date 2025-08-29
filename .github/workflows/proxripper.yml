@@ -58,8 +58,8 @@ jobs:
       - name: Send Telegram Notification
         run: |
           TIMESTAMP=$(date '+%d %b %Y %H:%M:%S GMT+1')
-          MESSAGE="🌐 *ProxRipper Proxy Update*\n\n🕒 Updated: $TIMESTAMP\n\n📥 Download proxies directly:\n- HTTP: [http.txt](https://mohammedcha.github.io/ProxRipper/full_proxies/http.txt)\n- HTTPS: [https.txt](https://mohammedcha.github.io/ProxRipper/full_proxies/https.txt)\n- SOCKS4: [socks4.txt](https://mohammedcha.github.io/ProxRipper/full_proxies/socks4.txt)\n- SOCKS5: [socks5.txt](https://mohammedcha.github.io/ProxRipper/full_proxies/socks5.txt)\n\n🌍 Visit our [website](https://mohammedcha.github.io/ProxRipper/) to filter proxies by country!"
+          MESSAGE="🌐 *ProxRipper Proxy Update*\n\n🕒 *Updated*: ${TIMESTAMP}\n\n📥 *Download proxies directly*:\n- [HTTP](https://mohammedcha.github.io/ProxRipper/full_proxies/http.txt)\n- [HTTPS](https://mohammedcha.github.io/ProxRipper/full_proxies/https.txt)\n- [SOCKS4](https://mohammedcha.github.io/ProxRipper/full_proxies/socks4.txt)\n- [SOCKS5](https://mohammedcha.github.io/ProxRipper/full_proxies/socks5.txt)\n\n🌍 *Visit our* [website](https://mohammedcha.github.io/ProxRipper/) *to filter proxies by country!*"
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage \
             -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d parse_mode=Markdown \
-            -d text="$MESSAGE"
+            -d parse_mode=MarkdownV2 \
+            -d text="${MESSAGE}"
