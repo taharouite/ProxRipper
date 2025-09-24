@@ -2,11 +2,11 @@ name: ProxRipper Auto Scraper
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/15 * * * *"   # كل 15 دقيقة
   workflow_dispatch:
 
 permissions:
-  contents: write  
+  contents: write
 
 concurrency:
   group: proxripper
@@ -19,6 +19,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # يضمن استخدام GITHUB_TOKEN للدفع
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,33 +32,50 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Ensure output dirs/files exist (first run safety)
+        run: |
+          mkdir -p full_proxies
+          touch full_proxies/http.txt full_proxies/https.txt full_proxies/socks4.txt full_proxies/socks5.txt
+          touch summary.json
+
       - name: Run ProxRipper
         run: |
           python ProxRipper.py
-          # Log total proxies for each type
           echo "=== Proxy Stats ==="
           for proto in http https socks4 socks5; do
-            count=$(wc -l < full_proxies/$proto.txt || echo 0)
+            if [ -f "full_proxies/$proto.txt" ]; then
+              count=$(wc -l < "full_proxies/$proto.txt")
+            else
+              count=0
+            fi
             echo "$proto: $count proxies"
           done
 
-      - name: Push changes
+      - name: Commit & push changes
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "40530012+Mohammedcha@users.noreply.github.com"
-          git add full_proxies/*.txt summary.json README.md
-          # Force a commit even if files look unchanged
-          TZ="Europe/Paris" git commit --allow-empty -m "Auto update proxies [$(date '+%d %b %Y %H:%M:%S GMT+1')]"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Mohammedcha/ProxRipper.git HEAD:main
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git add full_proxies/*.txt summary.json README.md || true
+          git commit -m "Auto update proxies: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" || echo "No changes"
+          # يدفع إلى نفس الريبو والفرع الحاليين
+          git push
 
-      - name: Send Telegram Notification
+      - name: Send Telegram Notification (if secrets exist)
+        if: ${{ secrets.TELEGRAM_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != '' }}
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # روابط خام ديناميكية لحسابك الحالي
+          RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main/full_proxies
+          SITE_LINK: https://${{ github.repository_owner }}.github.io/ProxRipper/
         run: |
           TIMESTAMP=$(date '+%d %b %Y %H:%M:%S GMT+1')
           MESSAGE=$(cat <<-EOF
@@ -64,15 +84,15 @@ jobs:
 
           📥 *Download proxies directly*:
 
-          \- HTTP Proxies : [DOWNLOAD](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/http.txt)
-          \- HTTPS Proxies : [DOWNLOAD](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/https.txt)
-          \- SOCKS4 Proxies : [DOWNLOAD](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks4.txt)
-          \- SOCKS5 Proxies : [DOWNLOAD](https://raw.githubusercontent.com/mohammedcha/ProxRipper/main/full_proxies/socks5.txt)
+          \\- HTTP Proxies : [DOWNLOAD](${RAW_BASE}/http.txt)
+          \\- HTTPS Proxies : [DOWNLOAD](${RAW_BASE}/https.txt)
+          \\- SOCKS4 Proxies : [DOWNLOAD](${RAW_BASE}/socks4.txt)
+          \\- SOCKS5 Proxies : [DOWNLOAD](${RAW_BASE}/socks5.txt)
 
-          🌍 *Visit our* [website](https://mohammedcha.github.io/ProxRipper/) *to filter proxies by country*\!
+          🌍 *Visit our* [website](${SITE_LINK}) *to filter proxies by country*\\!
           EOF
           )
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
             -d parse_mode=MarkdownV2 \
-            -d text="${MESSAGE}"
+            --data-urlencode "text=${MESSAGE}"
