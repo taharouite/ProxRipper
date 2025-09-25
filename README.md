@@ -65,4 +65,3 @@ Get the latest **free proxies** directly from GitHub:
 - **SEO and marketing analytics** – test geo-targeted content  
 - **Security research & penetration testing** – test endpoints with multiple IPs  
 - **Developers & testers** – use free proxies for testing apps and websites
-
