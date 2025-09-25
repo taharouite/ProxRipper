@@ -2,7 +2,7 @@ name: ProxRipper Auto Scraper
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # كل 15 دقيقة
+    - cron: "*/15 * * * *"   # كل 15 دقيقة (UTC)
   workflow_dispatch:
 
 permissions:
@@ -20,7 +20,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # يضمن استخدام GITHUB_TOKEN للدفع
           persist-credentials: true
 
       - name: Set up Python
@@ -65,17 +64,15 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git add full_proxies/*.txt summary.json README.md || true
           git commit -m "Auto update proxies: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" || echo "No changes"
-          # يدفع إلى نفس الريبو والفرع الحاليين
           git push
 
       - name: Send Telegram Notification (if secrets exist)
-        if: ${{ secrets.TELEGRAM_TOKEN != '' && secrets.TELEGRAM_CHAT_ID != '' }}
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          # روابط خام ديناميكية لحسابك الحالي
           RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main/full_proxies
           SITE_LINK: https://${{ github.repository_owner }}.github.io/ProxRipper/
+        if: ${{ env.TELEGRAM_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
         run: |
           TIMESTAMP=$(date '+%d %b %Y %H:%M:%S GMT+1')
           MESSAGE=$(cat <<-EOF
@@ -96,4 +93,3 @@ jobs:
             -d chat_id="${TELEGRAM_CHAT_ID}" \
             -d parse_mode=MarkdownV2 \
             --data-urlencode "text=${MESSAGE}"
-    
